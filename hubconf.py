@@ -6,9 +6,9 @@ def facodec(pretrained=True):
     model = FACodec()
     model.eval()
     if pretrained:
-        encoder_checkpoint = torch.hub.load_state_dict_from_url("https://shared.korshakov.com/models/ns3_facodec_encoder.bin")
-        decoder_checkpoint = torch.hub.load_state_dict_from_url("https://shared.korshakov.com/models/ns3_facodec_decoder.bin")
-        redecoder_checkpoint = torch.hub.load_state_dict_from_url("https://shared.korshakov.com/models/ns3_facodec_redecoder.bin")
+        encoder_checkpoint = torch.hub.load_state_dict_from_url("https://github.com/ex3ndr/facodec/releases/download/v1.0/ns3_facodec_encoder.bin")
+        decoder_checkpoint = torch.hub.load_state_dict_from_url("https://github.com/ex3ndr/facodec/releases/download/v1.0/ns3_facodec_decoder.bin")
+        redecoder_checkpoint = torch.hub.load_state_dict_from_url("https://github.com/ex3ndr/facodec/releases/download/v1.0/ns3_facodec_redecoder.bin")
         model.encoder.load_state_dict(encoder_checkpoint)
         model.decoder.load_state_dict(decoder_checkpoint)
         model.redecoder.load_state_dict(redecoder_checkpoint)
