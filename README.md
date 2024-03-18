@@ -7,7 +7,7 @@ This is easy to use FACodec model for voice encoding, which can be used for voic
 This library is meant to be used with Torch Hub and depends only on `torch` and `torchaudio` packages:
 
 ```python
-facodec = torch.hub.load(repo_or_dir='ex3ndr/supervoice-facodec', model='facodec', trust_repo = True)
+facodec = torch.hub.load(repo_or_dir='ex3ndr/facodec', model='facodec', trust_repo = True)
 ```
 
 ## Evaluation
