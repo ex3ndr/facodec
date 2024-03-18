@@ -1,6 +1,6 @@
-# FACodec
+# ✨ FACodec for Pytorch (Torch Hub)
 
-This is easy to use FACodec model for voice encoding, which can be used for voice conversion, voice style transfer, and voice synthesis. The model is exported from official implementation and uses original weights. This library just wraps the model and provides an easy to use interface, without the need to mangle with the original code.
+This is easy to use FACodec model for voice encoding, which can be used for voice conversion, voice style transfer, and voice synthesis. The model is exported from [official implementation](https://github.com/open-mmlab/Amphion/tree/main/models/codec/ns3_codec) and uses [original weights](https://huggingface.co/amphion/naturalspeech3_facodec). This library just wraps the model and provides an easy to use interface, without the need to mangle with the original code.
 
 ## Installation
 
@@ -9,6 +9,10 @@ This library is meant to be used with Torch Hub and depends only on `torch` and 
 ```python
 facodec = torch.hub.load(repo_or_dir='ex3ndr/supervoice-facodec', model='facodec', trust_repo = True)
 ```
+
+## Evaluation
+
+To evaluate model you can use [evaluation notebook](/eval.ipynb) which can run anywhere where `torch` and `torchaudio` are installed.
 
 ## How to use
 
