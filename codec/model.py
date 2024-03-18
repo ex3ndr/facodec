@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from .model_impl import FACodecEncoder, FACodecDecoder
+from .model_impl import FACodecEncoder, FACodecDecoder, FACodecRedecoder
 
 class FACodec(nn.Module):
     def __init__(self):
@@ -27,6 +27,7 @@ class FACodec(nn.Module):
             use_gr_residual_f0 = True,
             use_gr_residual_phone = True,
         )
+        self.redecoder = FACodecRedecoder()
 
     @torch.no_grad()
     def speaker_embedding(self, source):
@@ -42,6 +43,9 @@ class FACodec(nn.Module):
     def encode(self, source):
         assert source.dim() == 1, "Input tensor must be 1D"
 
+        # Convert to librosa-like amplitude
+        # source = source * 1.5
+
         # Run Encoder
         enc_out = self.encoder(source.unsqueeze(0).unsqueeze(0))
 
@@ -54,19 +58,37 @@ class FACodec(nn.Module):
         residual_code = vq_id[3:].squeeze(1)
 
         return prosody_code, cotent_code, residual_code, spk_embs.squeeze(0)
+    
+    @torch.no_grad()
+    def embeddings(self, prosody_code, cotent_code, residual_code):
+        # Merge codes
+        vq_id = torch.cat([prosody_code, cotent_code, residual_code], dim=0).unsqueeze(1)
+
+        # Run embedding
+        vq_emb = self.decoder.vq2emb(vq_id)
+
+        return vq_emb
 
     @torch.no_grad()
     def decode(self, prosody_code, cotent_code, residual_code, spk_embs):
 
         # Merge codes
-        if residual_code is None:    
-            vq_id = torch.cat([prosody_code, cotent_code], dim=0).unsqueeze(1)
-        else:
-            vq_id = torch.cat([prosody_code, cotent_code, residual_code], dim=0).unsqueeze(1)
+        vq_id = torch.cat([prosody_code, cotent_code, residual_code], dim=0).unsqueeze(1)
 
         # Run embedding
-        vq_emb = self.decoder.vq2emb(vq_id, use_residual_code = residual_code is not None)
+        vq_emb = self.decoder.vq2emb(vq_id)
 
         # Run decoder
         return self.decoder.inference(vq_emb, spk_embs.unsqueeze(0)).squeeze(0).squeeze(0)
 
+    @torch.no_grad()
+    def speech_convert(self, prosody_code, cotent_code, spk_embs):
+
+        # Merge codes
+        vq_id = torch.cat([prosody_code, cotent_code], dim=0).unsqueeze(1)
+
+        # Run embedding
+        vq_emb = self.redecoder.vq2emb(vq_id, spk_embs.unsqueeze(0), use_residual=False)
+
+        # Run decoder
+        return self.redecoder.inference(vq_emb, spk_embs.unsqueeze(0)).squeeze(0).squeeze(0)
